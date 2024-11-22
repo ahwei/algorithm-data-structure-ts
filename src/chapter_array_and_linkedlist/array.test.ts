@@ -5,6 +5,7 @@ describe("Array Algorithms", () => {
   it("should return a number from the array", () => {
     const nums = [1, 2, 3, 4, 5];
     const result = randomAccess(nums);
+
     expect(nums).toContain(result);
   });
 
