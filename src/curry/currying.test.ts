@@ -38,15 +38,19 @@ describe("apply, call, bind examples", () => {
   });
 
   it("should show practical curry with bind", () => {
-    function greet(greeting: string, name: string) {
-      return `${greeting}, ${name}!`;
+    function greet(this: string, greeting: string, name: string): string {
+      return `${greeting}, ${name}!, by ${this}!`;
     }
+    const name = "AhWei";
 
-    const sayHello = greet.bind(null, "Hello");
-    const sayGoodbye = greet.bind(null, "Goodbye");
+    const sayHelloUseBind = greet.bind(name, "Hello");
+    expect(sayHelloUseBind("John")).toBe("Hello, John!, by AhWei!");
 
-    expect(sayHello("John")).toBe("Hello, John!");
-    expect(sayGoodbye("Jane")).toBe("Goodbye, Jane!");
+    const sayHelloUseCall = greet.call(name, "Hello", "John");
+    expect(sayHelloUseCall).toBe("Hello, John!, by AhWei!");
+
+    const sayHelloUseApply = greet.apply(name, ["Hello", "John"]);
+    expect(sayHelloUseApply).toBe("Hello, John!, by AhWei!");
   });
 });
 
@@ -100,5 +104,32 @@ describe("currying examples", () => {
 
     const curriedMultiply = curryMixed(obj.multiply.bind(obj));
     expect(curriedMultiply(3)(4)).toBe(24); // 3 * 4 * 2
+  });
+
+  it("should demonstrate complex currying scenarios", () => {
+    // 定義一個複雜的問候函數
+    function complexGreet(
+      prefix: string,
+      greeting: string,
+      name: string,
+      suffix: string,
+    ) {
+      return `${prefix} ${greeting}, ${name}${suffix}`;
+    }
+
+    // 測試不同的 currying 方式
+    const formalGreetBind = complexGreet.bind(null, "Dear");
+    expect(formalGreetBind("Hello", "John", "!")).toBe("Dear Hello, John!");
+
+    const formalGreetCurry = curry(complexGreet)("Dear");
+    expect(formalGreetCurry("Hi")("Alice")("...")).toBe("Dear Hi, Alice...");
+
+    // 組合多個 curry 函數
+    const casualGreet = curry(complexGreet)("Hey")("What's up");
+    const greetJohn = casualGreet("John");
+    const greetMary = casualGreet("Mary");
+
+    expect(greetJohn("?")).toBe("Hey What's up, John?");
+    expect(greetMary("!")).toBe("Hey What's up, Mary!");
   });
 });
