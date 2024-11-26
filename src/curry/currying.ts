@@ -2,13 +2,22 @@ type curryFn = (...arg: any[]) => any;
 
 // 原始的 apply 版本
 export function curry(fn: curryFn) {
+  return function curried(...args: any[]) {
+    if (args.length >= fn.length) {
+      return fn(...args);
+    }
+
+    return (...moreArgs: any[]) => curried(...args, ...moreArgs);
+  };
+}
+
+export function curryWithApply(fn: curryFn) {
   return function curried(this: any, ...args: any[]) {
     if (args.length >= fn.length) {
       return fn.apply(this, args);
     }
-
     return function (this: any, ...moreArgs: any[]) {
-      return curried.apply(this, [...args, ...moreArgs]);
+      return curried.apply(this, args.concat(moreArgs));
     };
   };
 }
