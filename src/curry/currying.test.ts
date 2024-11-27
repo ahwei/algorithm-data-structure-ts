@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { curry, curryMixed, curryWithBind, curryWithCall } from "./currying";
+import {
+  curry,
+  curryAdvance,
+  curryMixed,
+  curryWithBind,
+  curryWithCall,
+} from "./currying";
 
 describe("apply, call, bind examples", () => {
   it("should demonstrate apply usage", () => {
@@ -131,5 +137,16 @@ describe("currying examples", () => {
 
     expect(greetJohn("?")).toBe("Hey What's up, John?");
     expect(greetMary("!")).toBe("Hey What's up, Mary!");
+  });
+
+  it("should demonstrate advanced currying scenarios", () => {
+    function join(a: any, b: any, c: any) {
+      return `${a}_${b}_${c}`;
+    }
+    const _ = curryAdvance.placeholder;
+    expect(curry(join)(1)(2)(3)).toBe("1_2_3");
+    expect(curry(join)(1, 2)(3)).toBe("1_2_3");
+    expect(curryAdvance(join)(_, _, 3, 4)(1, _)(2, 5)).toBe("1_2_3");
+    expect(curryAdvance(join)(1)(_, 3)(2)).toBe("1_2_3");
   });
 });

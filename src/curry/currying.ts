@@ -59,3 +59,28 @@ export function curryMixed(fn: curryFn) {
       boundCurried.call(this, ...args, ...moreArgs);
   };
 }
+
+export function curryAdvance(fn) {
+  return function curried(...args: any[]) {
+    if (
+      //如果參數的長度大於等於fn的長度，並且參數中沒有占位符
+      args.length >= fn.length &&
+      args
+        .slice(0, fn.length)
+        .every((item) => item !== curryAdvance.placeholder)
+    ) {
+      return fn(...args);
+    }
+
+    return function (...nextArgs: any[]) {
+      // 如果是占位符，就用 nextArgs 的第一個參數替換
+      const mappedArgsTo = args.map((item) =>
+        item === curryAdvance.placeholder ? nextArgs.shift() : item,
+      );
+
+      return curried(...mappedArgsTo, ...nextArgs);
+    };
+  };
+}
+
+curryAdvance.placeholder = Symbol();
