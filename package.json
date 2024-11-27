@@ -1,8 +1,12 @@
 {
-  "name": "akgirutgn-ts",
+  "name": "ts-interview",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "A TypeScript project and react app for interview",
+  "author": {
+    "name": "AhWei"
+  },
   "scripts": {
     "start": "ts-node --esm src/index.ts",
     "ts-node": "ts-node",
