@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { bubbleSort, bubbleSortDescending, selectionSort } from "./sort";
+import {
+  bubbleSort,
+  bubbleSortDescending,
+  quickSort,
+  selectionSort,
+} from "./sort";
 
 const question = [8, 1, 3, 2, 5, 4, 6, 7];
 const answer = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -16,6 +21,11 @@ describe("sort can work", () => {
 
   it("should selection sort numbers", () => {
     const result = selectionSort(question);
+    expect(result).toEqual(answer);
+  });
+
+  it("should quick sort numbers", () => {
+    const result = quickSort(question);
     expect(result).toEqual(answer);
   });
 });
