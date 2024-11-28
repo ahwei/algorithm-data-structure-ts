@@ -13,3 +13,19 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   };
 }
+
+export function throttleTimeout<T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number,
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout | null = null;
+
+  return function (...args: Parameters<T>) {
+    if (!timeoutId) {
+      fn(...args);
+      timeoutId = setTimeout(() => {
+        timeoutId = null;
+      }, delay);
+    }
+  };
+}
