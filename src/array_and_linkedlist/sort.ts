@@ -76,3 +76,38 @@ export function quickSort(numbers: number[]): number[] {
 
   return [...quickSort(left), pivot, ...quickSort(right)];
 }
+
+function merge(left: number[], right: number[]) {
+  const arr: number[] = [];
+  while (left.length && right.length) {
+    if (left[0] < right[0]) {
+      const value = left.shift();
+      if (value !== undefined) {
+        arr.push(value);
+      }
+    } else {
+      const value = right.shift();
+      if (value !== undefined) {
+        arr.push(value);
+      }
+    }
+  }
+  return [...arr, ...left, ...right];
+}
+
+/**
+ * 合併排序法
+ * 時間複雜度：O(n log n) - 因為每次都將數組分成兩半，需要 log n 層，每層需要 O(n) 的時間來合併
+ * 空間複雜度：O(n) - 需要額外的數組空間來存儲合併結果
+ */
+export function mergeSort(numbers: number[]): number[] {
+  const half = numbers.length / 2;
+  if (numbers.length < 2) {
+    return numbers;
+  }
+
+  const left = numbers.slice(0, half);
+  const right = numbers.slice(half);
+
+  return merge(mergeSort(left), mergeSort(right));
+}

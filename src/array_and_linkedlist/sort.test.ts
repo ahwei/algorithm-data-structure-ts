@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   bubbleSort,
   bubbleSortDescending,
+  mergeSort,
   quickSort,
   selectionSort,
 } from "./sort";
@@ -26,6 +27,11 @@ describe("sort can work", () => {
 
   it("should quick sort numbers", () => {
     const result = quickSort(question);
+    expect(result).toEqual(answer);
+  });
+
+  it("should merge sort numbers", () => {
+    const result = mergeSort(question);
     expect(result).toEqual(answer);
   });
 });
