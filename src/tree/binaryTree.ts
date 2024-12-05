@@ -34,7 +34,27 @@ export function levelOrder(root: TreeNode | null): number[][] {
   return result;
 }
 
-//94. Binary Tree Inorder Traversal
+// 前序遍歷 (根->左->右)
+export function preorderTraversal(root: TreeNode | null): number[] {
+  const result: number[] = [];
+  const stack: TreeNode[] = [];
+  let current = root;
+
+  while (current || stack.length > 0) {
+    while (current) {
+      result.push(current.val); // 訪問根節點
+      stack.push(current);
+      current = current.left; // 遍歷左子樹
+    }
+
+    current = stack.pop()!;
+    current = current.right; // 遍歷右子樹
+  }
+
+  return result;
+}
+
+// 中序遍歷 (左->根->右)
 export function inorderTraversal(root: TreeNode | null): number[] {
   const result: number[] = [];
   const stack: TreeNode[] = [];
@@ -43,12 +63,40 @@ export function inorderTraversal(root: TreeNode | null): number[] {
   while (current || stack.length > 0) {
     while (current) {
       stack.push(current);
-      current = current.left!;
+      current = current.left; // 遍歷左子樹
     }
 
     current = stack.pop()!;
-    result.push(current.val);
-    current = current.right!;
+    result.push(current.val); // 訪問根節點
+    current = current.right; // 遍歷右子樹
+  }
+
+  return result;
+}
+
+// 後序遍歷 (左->右->根)
+export function postorderTraversal(root: TreeNode | null): number[] {
+  const result: number[] = [];
+  const stack: TreeNode[] = [];
+  let current = root;
+  let lastVisited: TreeNode | null = null;
+
+  while (current || stack.length > 0) {
+    while (current) {
+      stack.push(current);
+      current = current.left; // 遍歷左子樹
+    }
+
+    current = stack[stack.length - 1];
+    // 如果右子樹為空或已訪問過，則訪問根節點
+    if (!current.right || current.right === lastVisited) {
+      result.push(current.val); // 訪問根節點
+      lastVisited = current;
+      stack.pop();
+      current = null;
+    } else {
+      current = current.right; // 遍歷右子樹
+    }
   }
 
   return result;
