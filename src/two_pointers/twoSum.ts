@@ -33,3 +33,32 @@ export function twoSumSlow(nums: number[], target: number): number[] {
 
   return [];
 }
+
+/**
+ * 時間複雜度: O(nlogn) - 主要來自排序過程
+ * 空間複雜度: O(n) - 需要存儲索引陣列
+ */
+export function twoSumTwoPointers(nums: number[], target: number): number[] {
+  // 創建包含原始索引的陣列
+  const indexedNums = nums.map((num, index) => ({ num, index }));
+
+  // 根據數字大小排序
+  indexedNums.sort((a, b) => a.num - b.num);
+
+  let left = 0;
+  let right = indexedNums.length - 1;
+
+  while (left < right) {
+    const sum = indexedNums[left].num + indexedNums[right].num;
+
+    if (sum === target) {
+      return [indexedNums[left].index, indexedNums[right].index];
+    } else if (sum < target) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+
+  return [];
+}
