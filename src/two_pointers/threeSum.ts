@@ -1,11 +1,13 @@
 /**
+ * LeetCode 15. 3Sum
+ * https://leetcode.com/problems/3sum/
+ *
  * Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]]
  * such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
  *
  * Time Complexity: O(n^2)
  * - O(nlogn) for sorting
  * - O(n^2) for two pointers traversal
- * - Overall time complexity is O(n^2)
  *
  * Space Complexity: O(1)
  * - Only constant extra space is used excluding the output array
