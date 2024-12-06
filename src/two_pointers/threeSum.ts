@@ -29,7 +29,9 @@ export function threeSum(nums: number[]): number[][] {
     while (low < high) {
       if (nums[low] + nums[high] === sum) {
         result.push([nums[i], nums[low], nums[high]]);
+        // Skip duplicate values
         while (low < high && nums[low] === nums[low + 1]) low++;
+        // Skip duplicate values
         while (low < high && nums[high] === nums[high - 1]) high--;
         low++;
         high--;
