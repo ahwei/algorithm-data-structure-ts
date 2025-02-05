@@ -39,49 +39,36 @@ const isEmptyOrNull = (item: any): boolean => {
 
   return true;
 };
-export const cleanEmptyData = (taskData: any[]) => {
-  const stack = [{ arr: taskData, index: -1 }];
+
+export const cleanEmptyData = (taskData: any[]): void => {
+  const stack = [taskData];
 
   while (stack.length > 0) {
-    const current = stack[stack.length - 1];
-    const container = current.arr;
+    const current = stack.pop()!;
 
-    if (Array.isArray(container)) {
-      current.index++;
-
-      if (current.index >= container.length) {
-        for (let i = container.length - 1; i >= 0; i--) {
-          if (isEmptyOrNull(container[i])) {
-            container.splice(i, 1);
-          }
+    if (Array.isArray(current)) {
+      for (let i = 0; i < current.length; i++) {
+        if (typeof current[i] === "object" && current[i] !== null) {
+          stack.push(current[i]);
         }
-        stack.pop();
-        continue;
       }
 
-      if (
-        typeof container[current.index] === "object" &&
-        container[current.index] !== null
-      ) {
-        stack.push({ arr: container[current.index], index: -1 });
-      }
-    } else {
-      const keys = Object.keys(container);
-      current.index++;
-
-      if (current.index >= keys.length) {
-        for (const key of keys) {
-          if (isEmptyOrNull(container[key])) {
-            delete container[key];
-          }
+      for (let i = current.length - 1; i >= 0; i--) {
+        if (isEmptyOrNull(current[i])) {
+          current.splice(i, 1);
         }
-        stack.pop();
-        continue;
+      }
+    } else if (typeof current === "object") {
+      for (const key of Object.keys(current)) {
+        if (typeof current[key] === "object" && current[key] !== null) {
+          stack.push(current[key]);
+        }
       }
 
-      const key = keys[current.index];
-      if (typeof container[key] === "object" && container[key] !== null) {
-        stack.push({ arr: container[key], index: -1 });
+      for (const key of Object.keys(current)) {
+        if (isEmptyOrNull(current[key])) {
+          delete current[key];
+        }
       }
     }
   }
