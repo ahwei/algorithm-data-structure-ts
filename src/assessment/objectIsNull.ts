@@ -15,19 +15,30 @@ const taskData = [
 ];
 
 const isEmptyOrNull = (item: any): boolean => {
-  if (item === null || item === undefined) return true;
-  if (typeof item !== "object") return false;
-  if (Array.isArray(item)) {
-    const filtered = item.filter((x) => !isEmptyOrNull(x));
-    return filtered.length === 0;
+  const stack: any[] = [item];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+
+    if (current === null || current === undefined) continue;
+    if (typeof current !== "object") return false;
+
+    if (Array.isArray(current)) {
+      if (current.length === 0) continue;
+      for (const elem of current) {
+        stack.push(elem);
+      }
+    } else {
+      const keys = Object.keys(current);
+      if (keys.length === 0) continue;
+      for (const key of keys) {
+        stack.push(current[key]);
+      }
+    }
   }
 
-  const filteredKeys = Object.keys(item).filter(
-    (key) => !isEmptyOrNull(item[key]),
-  );
-  return filteredKeys.length === 0;
+  return true;
 };
-
 export const cleanEmptyData = (taskData: any[]) => {
   const stack = [{ arr: taskData, index: -1 }];
 
