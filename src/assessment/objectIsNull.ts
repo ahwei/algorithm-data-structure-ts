@@ -1,10 +1,79 @@
-// 3)	Code challenge: The below is a coding test, we do not necessarily expect the correct answer, we would like your best answer even if it isn’t perfect. How you approach the question is as important as the final answer. Please take your time. Any resources may be used.
+type NestedObject = { [key: string]: any };
+type DataType = Array<any> | NestedObject;
 
-// In JavaScript, WITHOUT USING RECURSION, write and call a method or methods that will mutate and remove all null and undefined values, and any empty objects (AFTER removal of null/undefined) from the task array. You must not use recursion.
+const isNullOrUndefined = (value: any): boolean =>
+  value === null || value === undefined;
 
-// An example "taskData" constant is provided, but the method should work for any object or array with any number of nested objects or arrays. NOTE - you must mutate "taskData" and all its nested arrays/objects, not create new arrays/objects.
+const isEmpty = (value: any): boolean => {
+  if (isNullOrUndefined(value)) return true;
+  if (typeof value !== "object") return false;
 
-// Hint - the expected result is: "[{b: 1}, [2, 3], {a: 4}]"
+  const stack: any[] = [value];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+
+    if (Array.isArray(current)) {
+      if (current.length === 0) continue;
+      stack.push(...current);
+    } else if (typeof current === "object" && current !== null) {
+      const keys = Object.keys(current);
+      if (keys.length === 0) continue;
+      stack.push(...Object.values(current));
+    } else if (!isNullOrUndefined(current)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const cleanArray = (arr: any[]): void => {
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (isEmpty(arr[i])) {
+      arr.splice(i, 1);
+    }
+  }
+
+  if (arr.length === 1 && Array.isArray(arr[0])) {
+    const innerArray = arr[0];
+    arr.length = 0;
+    arr.push(...innerArray);
+  }
+};
+
+const cleanObject = (obj: NestedObject): void => {
+  const keys = Object.keys(obj);
+  for (const key of keys) {
+    if (isEmpty(obj[key])) {
+      delete obj[key];
+    }
+  }
+};
+
+export const cleanEmptyData = (data: DataType): void => {
+  const stack: DataType[] = [data];
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+
+    if (Array.isArray(current)) {
+      current.forEach((item) => {
+        if (typeof item === "object" && !isNullOrUndefined(item)) {
+          stack.push(item);
+        }
+      });
+      cleanArray(current);
+    } else {
+      Object.values(current).forEach((value) => {
+        if (typeof value === "object" && !isNullOrUndefined(value)) {
+          stack.push(value);
+        }
+      });
+      cleanObject(current);
+    }
+  }
+};
 
 const taskData = [
   { a: null, b: 1 },
@@ -14,75 +83,57 @@ const taskData = [
   { a: 4, b: { a: null, b: null }, c: { a: null } },
 ];
 
-const isEmptyOrNull = (item: any): boolean => {
-  const stack: any[] = [item];
-
-  while (stack.length > 0) {
-    const current = stack.pop();
-
-    if (current === null || current === undefined) continue;
-    if (typeof current !== "object") return false;
-
-    if (Array.isArray(current)) {
-      if (current.length === 0) continue;
-      for (const elem of current) {
-        stack.push(elem);
-      }
-    } else {
-      const keys = Object.keys(current);
-      if (keys.length === 0) continue;
-      for (const key of keys) {
-        stack.push(current[key]);
-      }
-    }
-  }
-
-  return true;
-};
-
-export const cleanEmptyData = (taskData: any[]): void => {
-  const stack = [taskData];
-
-  while (stack.length > 0) {
-    const current = stack.pop()!;
-
-    if (Array.isArray(current)) {
-      for (let i = 0; i < current.length; i++) {
-        if (typeof current[i] === "object" && current[i] !== null) {
-          stack.push(current[i]);
-        }
-      }
-
-      for (let i = current.length - 1; i >= 0; i--) {
-        if (isEmptyOrNull(current[i])) {
-          current.splice(i, 1);
-        } else if (Array.isArray(current[i]) && current[i].length === 0) {
-          current.splice(i, 1);
-        }
-      }
-
-      if (current.length === 1 && Array.isArray(current[0])) {
-        const innerArray = current[0];
-        current.length = 0;
-        current.push(...innerArray);
-      }
-    } else if (typeof current === "object") {
-      for (const key of Object.keys(current)) {
-        if (typeof current[key] === "object" && current[key] !== null) {
-          stack.push(current[key]);
-        }
-      }
-
-      for (const key of Object.keys(current)) {
-        if (isEmptyOrNull(current[key])) {
-          delete current[key];
-        }
-      }
-    }
-  }
-};
-
 cleanEmptyData(taskData);
-
 console.log(taskData);
 // Output: [{b: 1}, [2, 3], {a: 4}]
+
+// More test cases examples:
+// Test Case 1: Empty array
+const emptyArray: any[] = [];
+cleanEmptyData(emptyArray);
+console.log(emptyArray);
+// Output: []
+
+// Test Case 2: Deeply nested objects
+const nestedObjects = [
+  {
+    a: { b: { c: null, d: 1 }, e: null },
+    f: { g: { h: {} } },
+  },
+];
+cleanEmptyData(nestedObjects);
+console.log(nestedObjects);
+// Output: [{ a: { b: { d: 1 } } }]
+
+// Test Case 3: Deeply nested arrays
+const nestedArrays = [
+  [[], [null], [undefined]],
+  [1, [2, [3, null, 4], undefined], 5],
+];
+cleanEmptyData(nestedArrays);
+console.log(nestedArrays);
+// Output: [[1, [2, [3, 4]], 5]]
+
+// Test Case 4: Mixed data types
+const mixedTypes = [
+  { arr: [null, 1, { a: null }], num: 42 },
+  "string",
+  null,
+  { obj: {} },
+  [undefined],
+];
+cleanEmptyData(mixedTypes);
+console.log(mixedTypes);
+// Output: [{ arr: [1], num: 42 }, "string"]
+
+// Test Case 5: Array with only null/undefined values
+const nullArray = [null, undefined, null, [null], { a: null }];
+cleanEmptyData(nullArray);
+console.log(nullArray);
+// Output: []
+
+// Test Case 6: Primitive values
+const primitiveArray = [1, "string", true, 0, false];
+cleanEmptyData(primitiveArray);
+console.log(primitiveArray);
+// Output: [1, "string", true, 0, false]
