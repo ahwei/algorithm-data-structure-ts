@@ -1,26 +1,26 @@
 type NestedObject = { [key: string]: any };
 type DataType = Array<any> | NestedObject;
 
-const isNullOrUndefined = (value: any): boolean =>
-  value === null || value === undefined;
+const isNullOrUndefined = (element: any): boolean =>
+  element === null || element === undefined;
 
-const isEmpty = (value: any): boolean => {
-  if (isNullOrUndefined(value)) return true;
-  if (typeof value !== "object") return false;
+const isEmpty = (targetValue: any): boolean => {
+  if (isNullOrUndefined(targetValue)) return true;
+  if (typeof targetValue !== "object") return false;
 
-  const stack: any[] = [value];
+  const pendingItems: any[] = [targetValue];
 
-  while (stack.length > 0) {
-    const current = stack.pop();
+  while (pendingItems.length > 0) {
+    const currentItem = pendingItems.pop();
 
-    if (Array.isArray(current)) {
-      if (current.length === 0) continue;
-      stack.push(...current);
-    } else if (typeof current === "object" && current !== null) {
-      const keys = Object.keys(current);
-      if (keys.length === 0) continue;
-      stack.push(...Object.values(current));
-    } else if (!isNullOrUndefined(current)) {
+    if (Array.isArray(currentItem)) {
+      if (currentItem.length === 0) continue;
+      pendingItems.push(...currentItem);
+    } else if (typeof currentItem === "object" && currentItem !== null) {
+      const propertyKeys = Object.keys(currentItem);
+      if (propertyKeys.length === 0) continue;
+      pendingItems.push(...Object.values(currentItem));
+    } else if (!isNullOrUndefined(currentItem)) {
       return false;
     }
   }
@@ -28,49 +28,52 @@ const isEmpty = (value: any): boolean => {
   return true;
 };
 
-const cleanArray = (arr: any[]): void => {
-  for (let i = arr.length - 1; i >= 0; i--) {
-    if (isEmpty(arr[i])) {
-      arr.splice(i, 1);
+const cleanArray = (targetArray: any[]): void => {
+  for (let arrayIndex = targetArray.length - 1; arrayIndex >= 0; arrayIndex--) {
+    if (isEmpty(targetArray[arrayIndex])) {
+      targetArray.splice(arrayIndex, 1);
     }
   }
 
-  if (arr.length === 1 && Array.isArray(arr[0])) {
-    const innerArray = arr[0];
-    arr.length = 0;
-    arr.push(...innerArray);
+  if (targetArray.length === 1 && Array.isArray(targetArray[0])) {
+    const nestedArray = targetArray[0];
+    targetArray.length = 0;
+    targetArray.push(...nestedArray);
   }
 };
 
-const cleanObject = (obj: NestedObject): void => {
-  const keys = Object.keys(obj);
-  for (const key of keys) {
-    if (isEmpty(obj[key])) {
-      delete obj[key];
+const cleanObject = (targetObject: NestedObject): void => {
+  const propertyKeys = Object.keys(targetObject);
+  for (const propertyName of propertyKeys) {
+    if (isEmpty(targetObject[propertyName])) {
+      delete targetObject[propertyName];
     }
   }
 };
 
-export const cleanEmptyData = (data: DataType): void => {
-  const stack: DataType[] = [data];
+export const cleanEmptyData = (sourceData: DataType): void => {
+  const pendingData: DataType[] = [sourceData];
 
-  while (stack.length > 0) {
-    const current = stack.pop()!;
+  while (pendingData.length > 0) {
+    const currentData = pendingData.pop()!;
 
-    if (Array.isArray(current)) {
-      current.forEach((item) => {
-        if (typeof item === "object" && !isNullOrUndefined(item)) {
-          stack.push(item);
+    if (Array.isArray(currentData)) {
+      currentData.forEach((nestedItem) => {
+        if (typeof nestedItem === "object" && !isNullOrUndefined(nestedItem)) {
+          pendingData.push(nestedItem);
         }
       });
-      cleanArray(current);
+      cleanArray(currentData);
     } else {
-      Object.values(current).forEach((value) => {
-        if (typeof value === "object" && !isNullOrUndefined(value)) {
-          stack.push(value);
+      Object.values(currentData).forEach((nestedValue) => {
+        if (
+          typeof nestedValue === "object" &&
+          !isNullOrUndefined(nestedValue)
+        ) {
+          pendingData.push(nestedValue);
         }
       });
-      cleanObject(current);
+      cleanObject(currentData);
     }
   }
 };
