@@ -56,7 +56,15 @@ export const cleanEmptyData = (taskData: any[]): void => {
       for (let i = current.length - 1; i >= 0; i--) {
         if (isEmptyOrNull(current[i])) {
           current.splice(i, 1);
+        } else if (Array.isArray(current[i]) && current[i].length === 0) {
+          current.splice(i, 1);
         }
+      }
+
+      if (current.length === 1 && Array.isArray(current[0])) {
+        const innerArray = current[0];
+        current.length = 0;
+        current.push(...innerArray);
       }
     } else if (typeof current === "object") {
       for (const key of Object.keys(current)) {
